@@ -94,6 +94,22 @@ func save_to_disk(ivorn string, topic string, content string) {
 
 func read_config_from_file() (string, string, string, string, []string) {
 	// read the config from a file
+	_, err1 := os.Stat("gcn-kafka.conf")
+	_, err2 := os.Stat("gcn-kafka.default.conf")
+
+	if os.IsNotExist(err1) && os.IsNotExist(err2) {
+		fmt.Println("Default config file does not exist.\nCreating default config file...")
+		file, err := os.Create("gcn-kafka.default.conf")
+		if err != nil {
+			panic(err)
+		}
+		// write the default config to the file
+		_, err = file.WriteString("domain = gcn.nasa.gov\nclient_id = \nclient_secret = \ngroup_id = \ntopics = \n")
+		if err != nil {
+			panic(err)
+		}
+		file.Close()
+	}
 
 	// check if a file named gcn-kafka.conf exists
 	if _, err := os.Stat("gcn-kafka.conf"); os.IsNotExist(err) {
