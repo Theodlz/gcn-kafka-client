@@ -50,17 +50,27 @@ func NewConsumer(domain string, group_id string, client_id string, client_secret
 	return c, nil
 }
 
-func get_ivorn(content string) string {
-	// get the ivorn from the content
-	ivorn := strings.Split(strings.Split(content, "role")[0], "ivorn=\"ivo://nasa.gsfc.gcn/")[1]
-	//remove all spaces and \n, \t from the ivorn
-	ivorn = strings.ReplaceAll(ivorn, " ", "")
-	ivorn = strings.ReplaceAll(ivorn, "\n", "")
-	return ivorn
+func get_ivorn(content string) (string, error) {
+	var ivorn string
+	if strings.Contains(content, "ivorn=\"") {
+		ivorn = strings.Split(content, "ivorn=\"")[1]
+	} else {
+		return "", fmt.Errorf("no ivorn found in content 1")
+	}
+	if strings.Contains(ivorn, "\"") {
+		ivorn = strings.Split(ivorn, "\"")[0]
+	} else {
+		return "", fmt.Errorf("no ivorn found in content 2")
+	}
+	if strings.Contains(content, "/") {
+		ivorn = strings.Split(ivorn, "/")[len(strings.Split(ivorn, "/"))-1]
+	} else {
+		return "", fmt.Errorf("no ivorn found in content 3")
+	}
+	return ivorn, nil
 }
 
 func get_topic(topic string) string {
-	// get the topic from the topic
 	topic_split := strings.Split(topic, ".")
 	topic = topic_split[len(topic_split)-1]
 	//remove all spaces and \n, \t from the topic
@@ -220,7 +230,12 @@ func main() {
 			case *kafka.Message:
 				content := string(e.Value)
 
-				ivorn := get_ivorn(content)
+				ivorn, err := get_ivorn(content)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+
 				topic := get_topic(*e.TopicPartition.Topic)
 				fmt.Printf("ivorn: %s, topic: %s\n", ivorn, topic)
 
