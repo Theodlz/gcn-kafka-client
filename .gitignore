@@ -1,0 +1,9 @@
+*
+
+!gcn-kafka-client.go
+!go.mod
+!go.sum
+!.gitignore
+!.git
+!gcn-kafka.default.conf
+!README

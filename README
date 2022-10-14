@@ -1,0 +1,8 @@
+This is a client to poll alerts from gcn-kafka as VOEVENTS, and store them on disk.
+We use this to build an archive of VOEVENTS, that we can use for various purposes.
+
+We used golang so we can compile it into a fairly small binary, of around 3.5MB.
+
+You can set the client id, secret, domain and topics to poll from in the config file.
+
+You can download the client from the releases page.
